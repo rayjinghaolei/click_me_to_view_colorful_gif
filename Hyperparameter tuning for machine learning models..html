@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+    <title>Hyperparameter tuning for machine learning models.</title>
+    <meta name="HandheldFriendly" content="True" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <link rel="stylesheet" type="text/css" href="/assets/built/screen.css?v=3e9ac38a9e" />
+
+    <link rel="icon" href="/favicon.png" type="image/png" />
+    <link rel="canonical" href="https://www.jeremyjordan.me/hyperparameter-tuning/" />
+    <meta name="referrer" content="no-referrer-when-downgrade" />
+    <link rel="amphtml" href="https://www.jeremyjordan.me/hyperparameter-tuning/amp/" />
+    
+    <meta property="og:site_name" content="Jeremy Jordan" />
+    <meta property="og:type" content="article" />
+    <meta property="og:title" content="Hyperparameter tuning for machine learning models." />
+    <meta property="og:description" content="When creating a machine learning model, you&#x27;ll be presented with design choices as to how to define your model architecture. Often times, we don&#x27;t immediately know what the optimal model architecture should be for a given model, and thus we&#x27;d like to be able to explore a range of possibilities." />
+    <meta property="og:url" content="https://www.jeremyjordan.me/hyperparameter-tuning/" />
+    <meta property="og:image" content="https://www.jeremyjordan.me/content/images/2016/09/Untitled.png" />
+    <meta property="article:published_time" content="2017-11-02T17:22:14.000Z" />
+    <meta property="article:modified_time" content="2018-12-05T01:30:25.000Z" />
+    <meta property="article:tag" content="Data Science" />
+    
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Hyperparameter tuning for machine learning models." />
+    <meta name="twitter:description" content="When creating a machine learning model, you&#x27;ll be presented with design choices as to how to define your model architecture. Often times, we don&#x27;t immediately know what the optimal model architecture should be for a given model, and thus we&#x27;d like to be able to explore a range of possibilities." />
+    <meta name="twitter:url" content="https://www.jeremyjordan.me/hyperparameter-tuning/" />
+    <meta name="twitter:image" content="https://www.jeremyjordan.me/content/images/2016/09/Untitled.png" />
+    <meta name="twitter:label1" content="Written by" />
+    <meta name="twitter:data1" content="Jeremy Jordan" />
+    <meta name="twitter:label2" content="Filed under" />
+    <meta name="twitter:data2" content="Data Science" />
+    <meta name="twitter:site" content="@jeremyjordan" />
+    <meta name="twitter:creator" content="@jeremyjordan" />
+    <meta property="og:image:width" content="2448" />
+    <meta property="og:image:height" content="1780" />
+    
+    <script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "publisher": {
+        "@type": "Organization",
+        "name": "Jeremy Jordan",
+        "url": "https://www.jeremyjordan.me/",
+        "logo": {
+            "@type": "ImageObject",
+            "url": "https://www.jeremyjordan.me/favicon.png",
+            "width": 60,
+            "height": 60
+        }
+    },
+    "author": {
+        "@type": "Person",
+        "name": "Jeremy Jordan",
+        "image": {
+            "@type": "ImageObject",
+            "url": "https://www.jeremyjordan.me/content/images/2018/03/headshot-small.jpeg",
+            "width": 3000,
+            "height": 1995
+        },
+        "url": "https://www.jeremyjordan.me/author/jeremy/",
+        "sameAs": [
+            "https://twitter.com/jeremyjordan"
+        ]
+    },
+    "headline": "Hyperparameter tuning for machine learning models.",
+    "url": "https://www.jeremyjordan.me/hyperparameter-tuning/",
+    "datePublished": "2017-11-02T17:22:14.000Z",
+    "dateModified": "2018-12-05T01:30:25.000Z",
+    "keywords": "Data Science",
+    "description": "When creating a machine learning model, you&#x27;ll be presented with design choices\nas to how to define your model architecture. Often times, we don&#x27;t immediately\nknow what the optimal model architecture should be for a given model, and thus\nwe&#x27;d like to be able to explore a range of possibilities. In true machine\nlearning fashion, we&#x27;ll ideally ask the machine to perform this exploration and\nselect the optimal model architecture automatically. Parameters which define the\nmodel architecture are refe",
+    "mainEntityOfPage": {
+        "@type": "WebPage",
+        "@id": "https://www.jeremyjordan.me/"
+    }
+}
+    </script>
+
+    <meta name="generator" content="Ghost 4.9" />
+    <link rel="alternate" type="application/rss+xml" title="Jeremy Jordan" href="https://www.jeremyjordan.me/rss/" />
+    <script defer src="https://unpkg.com/@tryghost/portal@~1.7.0/umd/portal.min.js" data-ghost="https://www.jeremyjordan.me/" crossorigin="anonymous"></script><style id="gh-members-styles">.gh-post-upgrade-cta-content,
+.gh-post-upgrade-cta {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    text-align: center;
+    width: 100%;
+    color: #ffffff;
+    font-size: 16px;
+}
+
+.gh-post-upgrade-cta-content {
+    border-radius: 8px;
+    padding: 40px 4vw;
+}
+
+.gh-post-upgrade-cta h2 {
+    color: #ffffff;
+    font-size: 28px;
+    letter-spacing: -0.2px;
+    margin: 0;
+    padding: 0;
+}
+
+.gh-post-upgrade-cta p {
+    margin: 20px 0 0;
+    padding: 0;
+}
+
+.gh-post-upgrade-cta small {
+    font-size: 16px;
+    letter-spacing: -0.2px;
+}
+
+.gh-post-upgrade-cta a {
+    color: #ffffff;
+    cursor: pointer;
+    font-weight: 500;
+    box-shadow: none;
+    text-decoration: underline;
+}
+
+.gh-post-upgrade-cta a:hover {
+    color: #ffffff;
+    opacity: 0.8;
+    box-shadow: none;
+    text-decoration: underline;
+}
+
+.gh-post-upgrade-cta a.gh-btn {
+    display: block;
+    background: #ffffff;
+    text-decoration: none;
+    margin: 28px 0 0;
+    padding: 8px 18px;
+    border-radius: 4px;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.gh-post-upgrade-cta a.gh-btn:hover {
+    opacity: 0.92;
+}</style>
+    <script type="text/javascript">
+	var disqus_shortname = 'jeremyjordan';
+    var linkedin_user = 'jeremytjordan';
+</script>
+
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.7.0/styles/atom-one-dark.min.css">
+
+<!-- Fix first paragraph font size -->
+<style type="text/css">
+ .post-template .kg-card-markdown > p:first-child {font-size: 1em;}
+</style>
+
+<!-- Fix code injection -->
+<style>  
+  pre {
+    word-wrap: normal;
+    -moz-hyphens: none;
+    -ms-hyphens: none;
+    -webkit-hyphens: none;
+    hyphens: none;
+    font-size: 0.7em;
+    line-height: 1.3em;
+  }
+    pre code, pre tt {
+    white-space: pre;
+  }
+</style> 
+
+<!-- hypothes.is annotations and highlighting -->
+<script type="application/json" class="js-hypothesis-config">
+{"showHighlights": false}
+</script>
+
+<script src="https://hypothes.is/embed.js" async></script>
+
+
+<!-- Global Site Tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-107234089-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments)};
+  gtag('js', new Date());
+
+  gtag('config', 'UA-107234089-1');
+</script>
+<style>:root {--ghost-accent-color: #15171A;}</style>
+
+</head>
+<body class="post-template tag-data-science">
+
+    <div class="site-wrapper">
+
+        
+
+<header class="site-header">
+    <div class="outer site-nav-main">
+    <div class="inner">
+        <nav class="site-nav">
+    <div class="site-nav-left-wrapper">
+        <div class="site-nav-left">
+                <a class="site-nav-logo" href="https://www.jeremyjordan.me">Jeremy Jordan</a>
+            <div class="site-nav-content">
+                    <ul class="nav">
+    <li class="nav-home"><a href="https://www.jeremyjordan.me/">Home</a></li>
+    <li class="nav-about"><a href="https://www.jeremyjordan.me/about/">About</a></li>
+    <li class="nav-data-science"><a href="https://www.jeremyjordan.me/data-science/">Data Science</a></li>
+    <li class="nav-reading-list"><a href="https://www.jeremyjordan.me/books/">Reading List</a></li>
+    <li class="nav-quotes"><a href="https://www.jeremyjordan.me/quotes/">Quotes</a></li>
+    <li class="nav-life"><a href="https://www.jeremyjordan.me/tag/life/">Life</a></li>
+    <li class="nav-favorite-talks"><a href="https://www.jeremyjordan.me/my-favorite-talks/">Favorite Talks</a></li>
+    <li class="nav-materials-science"><a href="https://www.jeremyjordan.me/tag/materials-science/">Materials Science</a></li>
+</ul>
+
+                    <span class="nav-post-title dash">Hyperparameter tuning for machine learning models.</span>
+            </div>
+        </div>
+    </div>
+    <div class="site-nav-right">
+            <div class="social-links">
+                    <a class="social-link social-link-tw" href="https://twitter.com/jeremyjordan" title="Twitter" target="_blank" rel="noopener"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><path d="M30.063 7.313c-.813 1.125-1.75 2.125-2.875 2.938v.75c0 1.563-.188 3.125-.688 4.625a15.088 15.088 0 0 1-2.063 4.438c-.875 1.438-2 2.688-3.25 3.813a15.015 15.015 0 0 1-4.625 2.563c-1.813.688-3.75 1-5.75 1-3.25 0-6.188-.875-8.875-2.625.438.063.875.125 1.375.125 2.688 0 5.063-.875 7.188-2.5-1.25 0-2.375-.375-3.375-1.125s-1.688-1.688-2.063-2.875c.438.063.813.125 1.125.125.5 0 1-.063 1.5-.25-1.313-.25-2.438-.938-3.313-1.938a5.673 5.673 0 0 1-1.313-3.688v-.063c.813.438 1.688.688 2.625.688a5.228 5.228 0 0 1-1.875-2c-.5-.875-.688-1.813-.688-2.75 0-1.063.25-2.063.75-2.938 1.438 1.75 3.188 3.188 5.25 4.25s4.313 1.688 6.688 1.813a5.579 5.579 0 0 1 1.5-5.438c1.125-1.125 2.5-1.688 4.125-1.688s3.063.625 4.188 1.813a11.48 11.48 0 0 0 3.688-1.375c-.438 1.375-1.313 2.438-2.563 3.188 1.125-.125 2.188-.438 3.313-.875z"/></svg>
+</a>
+            </div>
+
+            <a class="subscribe-button" href="#subscribe">Subscribe</a>
+    </div>
+</nav>
+    </div>
+</div></header>
+
+
+<main id="site-main" class="site-main outer">
+    <div class="inner">
+
+        <article class="post-full post tag-data-science no-image no-image">
+
+            <header class="post-full-header">
+
+                <section class="post-full-tags">
+                    <a href="/tag/data-science/">Data Science</a>
+                </section>
+
+                <h1 class="post-full-title">Hyperparameter tuning for machine learning models.</h1>
+
+
+                <div class="post-full-byline">
+
+                    <section class="post-full-byline-content">
+
+                        <ul class="author-list">
+                            <li class="author-list-item">
+
+                                <div class="author-card">
+                                    <img class="author-profile-image" src="/content/images/size/w100/2018/03/headshot-small.jpeg" alt="Jeremy Jordan" />
+                                    <div class="author-info">
+                                        <div class="bio">
+                                            <h2>Jeremy Jordan</h2>
+                                            <p>Machine learning engineer. Broadly curious. </p>
+                                            <p><a href="/author/jeremy/">More posts</a> by Jeremy Jordan.</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <a href="/author/jeremy/" class="author-avatar">
+                                    <img class="author-profile-image" src="/content/images/size/w100/2018/03/headshot-small.jpeg" alt="Jeremy Jordan" />
+                                </a>
+
+                            </li>
+                        </ul>
+
+                        <section class="post-full-byline-meta">
+                            <h4 class="author-name"><a href="/author/jeremy/">Jeremy Jordan</a></h4>
+                            <div class="byline-meta-content">
+                                <time class="byline-meta-date" datetime="2017-11-02">2 Nov 2017</time>
+                                <span class="byline-reading-time"><span class="bull">&bull;</span> 8 min read</span>
+                            </div>
+                        </section>
+
+                    </section>
+
+
+                </div>
+            </header>
+
+
+            <section class="post-full-content">
+                <div class="post-content">
+                    <!--kg-card-begin: markdown--><p>When creating a machine learning model, you'll be presented with design choices as to how to define your model architecture. Often times, we don't immediately know what the optimal model architecture should be for a given model, and thus we'd like to be able to explore a range of possibilities. In true machine learning fashion, we'll ideally ask the machine to perform this exploration and select the optimal model architecture automatically. Parameters which define the model architecture are referred to as <strong>hyperparameters</strong> and thus this process of searching for the ideal model architecture is referred to as <em>hyperparameter tuning</em>.</p>
+<p>These hyperparameters might address model design questions such as:</p>
+<ul>
+<li>What degree of <a href="https://www.jeremyjordan.me/polynomial-regression/">polynomial features</a> should I use for my <a href="https://www.jeremyjordan.me/linear-regression/">linear model</a>?</li>
+<li>What should be the maximum depth allowed for my <a href="https://www.jeremyjordan.me/decision-trees-for-classification/">decision tree</a>?</li>
+<li>What should be the minimum number of samples required at a leaf node in my decision tree?</li>
+<li>How many trees should I include in my <a href="https://www.jeremyjordan.me/ensemble-learning/">random forest</a>?</li>
+<li>How many neurons should I have in my <a href="https://www.jeremyjordan.me/neural-networks-representation/">neural network</a> layer?</li>
+<li>How many layers should I have in my neural network?</li>
+<li>What should I set my learning rate to for gradient descent?</li>
+</ul>
+<p>I want to be absolutely clear, <em><strong>hyperparameters are not model parameters</strong></em> and they cannot be directly trained from the data. <em>Model parameters</em> are learned during training when we optimize a loss function using something like <a href="https://www.jeremyjordan.me/gradient-descent/">gradient descent</a>.The process for learning parameter values is shown generally below.</p>
+<p><img src="https://www.jeremyjordan.me/content/images/2017/11/Screen-Shot-2017-11-02-at-1.28.26-PM.png" alt="Screen-Shot-2017-11-02-at-1.28.26-PM" loading="lazy"></p>
+<p>Whereas the model parameters specify how to transform the input data into the desired output, the hyperparameters define how our model is actually structured. Unfortunately, there's no way to calculate “which way should I update my hyperparameter to reduce the loss?” (ie. gradients) in order to find the optimal model architecture; thus, we generally resort to experimentation to figure out what works best.</p>
+<p>In general, this process includes:</p>
+<ol>
+<li>Define a model</li>
+<li>Define the range of possible values for all hyperparameters</li>
+<li>Define a method for sampling hyperparameter values</li>
+<li>Define an evaluative criteria to judge the model</li>
+<li>Define a cross-validation method</li>
+</ol>
+<p>Specifically, the various hyperparameter tuning methods I'll discuss in this post offer various approaches to Step 3.</p>
+<h3 id="modelvalidation">Model validation</h3>
+<p>Before we discuss these various tuning methods, I'd like to quickly <a href="https://www.jeremyjordan.me/evaluating-a-machine-learning-model/">revisit</a> the purpose of splitting our data into training, validation, and test data. The ultimate goal for any machine learning model is to learn from examples in such a manner that the model is capable of generalizing the learning to new instances which it has not yet seen. At a very basic level, you should train on a subset of your total dataset, holding out the remaining data for evaluation to gauge the model's ability to generalize - in other words, &quot;how well will my model do on data which it hasn't directly learned from during training?&quot;</p>
+<p><img src="https://www.jeremyjordan.me/content/images/2017/10/Screen-Shot-2017-10-31-at-7.42.50-PM.png" alt="Screen-Shot-2017-10-31-at-7.42.50-PM" loading="lazy"></p>
+<p>When you start exploring various model architectures (ie. different hyperparameter values), you also need a way to evaluate each model's ability to generalize to unseen data. However, if you use the testing data for this evaluation, you'll end up &quot;fitting&quot; the model architecture to the testing data - losing the ability to truely evaluate how the model performs on unseen data. This is sometimes referred to as &quot;data leakage&quot;.</p>
+<p>To mitigate this, we'll end up splitting the total dataset into three subsets: training data, validation data, and testing data. The introduction of a validation dataset allows us to evaluate the model on different data than it was trained on and select the best model architecture, while still holding out a subset of the data for the final evaluation at the end of our model development.</p>
+<p><img src="https://www.jeremyjordan.me/content/images/2017/10/Screen-Shot-2017-10-31-at-7.43.02-PM.png" alt="Screen-Shot-2017-10-31-at-7.43.02-PM" loading="lazy"></p>
+<p>You can also leverage more advanced techniques such as K-fold cross validation in order to essentially combine training and validation data for both learning the model parameters and evaluating the model without introducing data leakage.</p>
+<h3 id="hyperparametertuningmethods">Hyperparameter tuning methods</h3>
+<p>Recall that I previously mentioned that the hyperparameter tuning methods relate to how we sample possible model architecture candidates from the space of possible hyperparameter values. This is often referred to as &quot;searching&quot; the hyperparameter space for the optimum values. In the following visualization, the $x$ and $y$ dimensions represent two hyperparameters, and the $z$ dimension represents the model's score (defined by some evaluation metric) for the architecture defined by $x$ and $y$.</p>
+<p><em>Note: Ignore the axes values, I borrowed this image as noted and the axis values don't correspond with logical values for the hyperparameters.</em></p>
+<p><img src="https://www.jeremyjordan.me/content/images/2017/11/hyperparameter_space.png" alt="hyperparameter_space" loading="lazy"><br>
+<small>Photo by <a href="https://blog.sigopt.com/posts/common-problems-in-hyperparameter-optimization">SigOpt</a></small></p>
+<p>If we had access to such a plot, choosing the ideal hyperparameter combination would be trivial. However, calculating such a plot at the granularity visualized above would be prohibitively expensive. Thus, we are left to blindly explore the hyperparameter space in hopes of locating the hyperparameter values which lead to the maximum score.</p>
+<p>For each method, I'll discuss how to search for the optimal structure of a random forest classifer. <a href="https://www.jeremyjordan.me/ensemble-learning/">Random forests</a> are an ensemble model comprised of a collection of <a href="https://www.jeremyjordan.me/decision-trees-for-classification/">decision trees</a>; when building such a model, two important hyperparameters to consider are:</p>
+<ul>
+<li>How many estimators (ie. decision trees) should I use?</li>
+<li>What should be the maximum allowable depth for each decision tree?</li>
+</ul>
+<h6 id="gridsearch">Grid search</h6>
+<p>Grid search is arguably the most basic hyperparameter tuning method. With this technique, we simply build a model for each possible combination of all of the hyperparameter values provided, evaluating each model, and selecting the architecture which produces the best results.</p>
+<p>For example, we would define a list of values to try for both <code>n_estimators</code> and <code>max_depth</code> and a grid search would build a model for each possible combination.</p>
+<p>Performing grid search over the defined hyperparameter space</p>
+<pre><code>n_estimators = [10, 50, 100, 200]
+max_depth = [3, 10, 20, 40]
+</code></pre>
+<p>would yield the following models.</p>
+<pre><code>RandomForestClassifier(n_estimators=10, max_depth=3)
+RandomForestClassifier(n_estimators=10, max_depth=10)
+RandomForestClassifier(n_estimators=10, max_depth=20)
+RandomForestClassifier(n_estimators=10, max_depth=40)
+
+RandomForestClassifier(n_estimators=50, max_depth=3)
+RandomForestClassifier(n_estimators=50, max_depth=10)
+RandomForestClassifier(n_estimators=50, max_depth=20)
+RandomForestClassifier(n_estimators=50, max_depth=40)
+
+RandomForestClassifier(n_estimators=100, max_depth=3)
+RandomForestClassifier(n_estimators=100, max_depth=10)
+RandomForestClassifier(n_estimators=100, max_depth=20)
+RandomForestClassifier(n_estimators=100, max_depth=40)
+
+RandomForestClassifier(n_estimators=200, max_depth=3)
+RandomForestClassifier(n_estimators=200, max_depth=10)
+RandomForestClassifier(n_estimators=200, max_depth=20)
+RandomForestClassifier(n_estimators=200, max_depth=40)
+</code></pre>
+<p>Each model would be fit to the training data and evaluated on the validation data. As you can see, this is an <em><strong>exhaustive</strong></em> sampling of the hyperparameter space and can be quite inefficient.</p>
+<p><img src="https://www.jeremyjordan.me/content/images/2017/11/grid_search.gif" alt="grid_search" loading="lazy"><br>
+<small>Photo by <a href="https://blog.sigopt.com/posts/common-problems-in-hyperparameter-optimization">SigOpt</a></small></p>
+<h6 id="randomsearch">Random search</h6>
+<p>Random search differs from grid search in that we longer provide a discrete set of values to explore for each hyperparameter; rather, we provide a statistical distribution for each hyperparameter from which values may be randomly sampled.</p>
+<p>We'll define a sampling distribution for each hyperparameter.</p>
+<pre><code>from scipy.stats import expon as sp_expon
+from scipy.stats import randint as sp_randint
+
+n_estimators = sp_expon(scale=100)
+max_depth = sp_randint(1, 40)
+</code></pre>
+<p>We can also define how many iterations we'd like to build when searching for the optimal model. For each iteration, the hyperparameter values of the model will be set by sampling the defined distributions above. The <code>scipy</code> distributions above may be sampled with the <code>rvs()</code> function - feel free to explore this in Python!</p>
+<p>One of the main theoretical backings to motivate the use of random search in place of grid search is the fact that for most cases, hyperparameters are not <em>equally</em> important.</p>
+<blockquote>
+<p>A Gaussian process analysis of the function from hyper-parameters to validation set performance reveals that <strong>for most data sets only a few of the hyper-parameters really matter, but that different hyper-parameters are important on different data sets</strong>. This phenomenon makes grid search a poor choice for configuring algorithms for new data sets. - <a href="http://jmlr.csail.mit.edu/papers/volume13/bergstra12a/bergstra12a.pdf">Bergstra, 2012</a></p>
+</blockquote>
+<p>In the following example, we're searching over a hyperparameter space where the one hyperparameter has significantly more influence on optimizing the model score - the distributions shown on each axis represent the model's score. In each case, we're evaluating nine different models. The grid search strategy blatantly misses the optimal model and spends redundant time exploring the unimportant parameter. During this grid search, we isolated each hyperparameter and searched for the best possible value while holding all other hyperparameters constant. For cases where the hyperparameter being studied has little effect on the resulting model score, this results in wasted effort. Conversely, the random search has much improved exploratory power and can focus on finding the optimal value for the important hyperparameter.</p>
+<p><img src="https://www.jeremyjordan.me/content/images/2017/11/grid_vs_random.png" alt="grid_vs_random" loading="lazy"><br>
+<small>Photo by <a href="http://jmlr.csail.mit.edu/papers/volume13/bergstra12a/bergstra12a.pdf">Bergstra, 2012</a></small></p>
+<p>As you can see, this search method works best under the assumption that not all hyperparameters are equally important. While this isn't always the case, the assumption holds true for most datasets.</p>
+<p><img src="https://www.jeremyjordan.me/content/images/2017/11/random_search.gif" alt="random_search" loading="lazy"><br>
+<small>Photo by <a href="https://blog.sigopt.com/posts/common-problems-in-hyperparameter-optimization">SigOpt</a></small></p>
+<h6 id="bayesianoptimization">Bayesian optimization</h6>
+<p>The previous two methods performed individual experiments building models with various hyperparameter values and recording the model performance for each. Because each experiment was performed in isolation, it's very easy to parallelize this process. However, because each experiment was performed in isolation, we're not able to use the information from one experiment to improve the next experiment. Bayesian optimization belongs to a class of <em>sequential model-based optimization</em> (SMBO) algorithms that allow for one to use the results of our previous iteration to improve our sampling method of the next experiment.</p>
+<p>We'll initially define a model constructed with hyperparameters $\lambda$ which, after training, is scored $v$ according to some evaluation metric. Next, we use the previously evaluated hyperparameter values to compute a posterior expectation of  the hyperparameter space. We can then choose the optimal hyperparameter values according to this posterior expectation as our next model candidate. We iteratively repeat this process until converging to an optimum.</p>
+<p>We'll use a Gaussian process to model our prior probability of model scores across the hyperparameter space. This model will essentially serve to use the hyperparameter values $\lambda_{1,...i}$ and corresponding scores $v_{1,...i}$ we've observed thus far to approximate a continuous score function over the hyperparameter space. This approximated function also includes the degree of certainty of our estimate, which we can use to identify the candidate hyperparameter values that would yield the largest expected improvement over the current score. The formulation for expected improvemenet is known as our acquisition function, which represents the posterior distribution of our score function across the hyperparameter space.</p>
+<p><img src="https://www.jeremyjordan.me/content/images/2017/11/Bayesian_optimization.gif" alt="Bayesian_optimization" loading="lazy"><br>
+<small>Photo by <a href="https://blog.sigopt.com/posts/common-problems-in-hyperparameter-optimization">SigOpt</a></small></p>
+<p><em>Note: these visualizations were provided by <a href="https://blog.sigopt.com/posts/common-problems-in-hyperparameter-optimization">SigOpt</a>, a company that offers a Bayesian optimization product. It's not likely a coincidence that the visualized hyperparamter space is such that Bayesian optimization performs best.</em></p>
+<h3 id="furtherreading">Further reading</h3>
+<ul>
+<li><a href="http://jmlr.csail.mit.edu/papers/volume13/bergstra12a/bergstra12a.pdf">Random Search for Hyper-Parameter Optimization</a></li>
+<li><a href="http://scikit-learn.org/stable/modules/grid_search.html">Tuning the hyper-parameters of an estimator</a></li>
+<li><a href="https://towardsdatascience.com/a-conceptual-explanation-of-bayesian-model-based-hyperparameter-optimization-for-machine-learning-b8172278050f">A Conceptual Explanation of Bayesian Hyperparameter Optimization for Machine Learning</a></li>
+<li><a href="https://blog.sigopt.com/posts/common-problems-in-hyperparameter-optimization">Common Problems in Hyperparameter Optimization</a></li>
+<li><a href="https://www.youtube.com/watch?v=DGJTEBt0d-s">Gilles Louppe | Bayesian optimization with Scikit-Optimize</a></li>
+<li><a href="https://towardsdatascience.com/hyperparameter-optimization-with-keras-b82e6364ca53">Hyperparameter Optimization with Keras</a></li>
+<li><a href="http://haikufactory.com/files/bayopt.pdf">A Tutorial on Bayesian Optimization of Expensive Cost Functions, with Application to Active User Modeling and Hierarchical Reinforcement Learning</a></li>
+<li><a href="https://deepmind.com/blog/population-based-training-neural-networks/">Population based training of neural networks</a></li>
+</ul>
+<p>Hyperparameter optimization libraries (free and open source):</p>
+<ul>
+<li><a href="http://ray.readthedocs.io/en/latest/tune.html">Ray.tune: Hyperparameter Optimization Framework</a></li>
+<li><a href="https://optuna.org/">Optuna</a></li>
+<li><a href="https://github.com/hyperopt/hyperopt">Hyperopt</a></li>
+<li><a href="https://github.com/polyaxon/polyaxon">Polyaxon</a></li>
+<li><a href="https://github.com/autonomio/talos">Talos</a></li>
+<li><a href="https://github.com/fmfn/BayesianOptimization">BayesianOptimization</a></li>
+<li><a href="https://github.com/Yelp/MOE">Metric Optimization Engine</a></li>
+<li><a href="https://github.com/HIPS/Spearmint">Spearmint</a></li>
+<li><a href="https://github.com/SheffieldML/GPyOpt">GPyOpt</a></li>
+<li><a href="https://scikit-optimize.github.io/#skopt.Optimizer">Scikit-Optimize</a></li>
+</ul>
+<p>Hyperparameter optimization libraries (everybody's favorite commerial library):</p>
+<ul>
+<li><a href="https://sigopt.com/">SigOpt</a></li>
+</ul>
+<p>Implementation examples:</p>
+<ul>
+<li><a href="http://betatim.github.io/posts/bayesian-hyperparameter-search/">Bayesian optimisation for smart hyperparameter search</a></li>
+<li><a href="https://thuijskens.github.io/2016/12/29/bayesian-optimisation/">Bayesian optimization with scikit-learn</a></li>
+<li><a href="https://thuijskens.github.io/2017/05/12/pydata-london/">Bayesian optimization with hyperopt</a></li>
+</ul>
+<!--kg-card-end: markdown-->
+                </div>
+            </section>
+
+                <section class="subscribe-form">
+    <h3 class="subscribe-form-title">Subscribe to Jeremy Jordan</h3>
+    <p class="subscribe-form-description">Get the latest posts delivered right to your inbox</p>
+    <form data-members-form="subscribe">
+        <div class="form-group">
+            <input class="subscribe-email" data-members-email placeholder="youremail@example.com" autocomplete="false" />
+            <button class="button primary" type="submit">
+                <span class="button-content">Subscribe</span>
+                <span class="button-loader"><svg version="1.1" id="loader-1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px"
+    y="0px" width="40px" height="40px" viewBox="0 0 40 40" enable-background="new 0 0 40 40" xml:space="preserve">
+    <path opacity="0.2" fill="#000" d="M20.201,5.169c-8.254,0-14.946,6.692-14.946,14.946c0,8.255,6.692,14.946,14.946,14.946
+s14.946-6.691,14.946-14.946C35.146,11.861,28.455,5.169,20.201,5.169z M20.201,31.749c-6.425,0-11.634-5.208-11.634-11.634
+c0-6.425,5.209-11.634,11.634-11.634c6.425,0,11.633,5.209,11.633,11.634C31.834,26.541,26.626,31.749,20.201,31.749z" />
+    <path fill="#000" d="M26.013,10.047l1.654-2.866c-2.198-1.272-4.743-2.012-7.466-2.012h0v3.312h0
+C22.32,8.481,24.301,9.057,26.013,10.047z">
+        <animateTransform attributeType="xml" attributeName="transform" type="rotate" from="0 20 20" to="360 20 20"
+            dur="0.5s" repeatCount="indefinite" />
+    </path>
+</svg></span>
+            </button>
+        </div>
+        <div class="message-success">
+            <strong>Great!</strong> Check your inbox and click the link to confirm your subscription.
+        </div>
+        <div class="message-error">
+            Please enter a valid email address!
+        </div>
+    </form>
+</section>
+            <section class="post-full-comments">
+                <div id="disqus_thread"></div>
+                <script>
+                    var disqus_config = function () {
+                        this.page.url = 'https://www.jeremyjordan.me/hyperparameter-tuning/';
+                        this.page.identifier = 'ghost-59f8ae8c0da2d500222ee585';
+                    };
+                    (function() {
+                        var d = document, s = d.createElement('script');
+                        s.src = 'https://jeremyjordan.disqus.com/embed.js';
+                        s.setAttribute('data-timestamp', +new Date());
+                        (d.head || d.body).appendChild(s);
+                    })();
+                </script>
+            </section>
+
+        </article>
+
+    </div>
+</main>
+
+<aside class="read-next outer">
+    <div class="inner">
+        <div class="read-next-feed">
+                <article class="read-next-card">
+                    <header class="read-next-card-header">
+                        <h3><span>More in</span> <a href="/tag/data-science/">Data Science</a></h3>
+                    </header>
+                    <div class="read-next-card-content">
+                        <ul>
+                            <li>
+                                <h4><a href="/ml-monitoring/">A simple solution for monitoring ML systems.</a></h4>
+                                <div class="read-next-card-meta">
+                                    <p><time datetime="2021-01-02">2 Jan 2021</time> –
+                                        10 min read</p>
+                                </div>
+                            </li>
+                            <li>
+                                <h4><a href="/testing-ml/">Effective testing for machine learning systems.</a></h4>
+                                <div class="read-next-card-meta">
+                                    <p><time datetime="2020-08-19">19 Aug 2020</time> –
+                                        9 min read</p>
+                                </div>
+                            </li>
+                            <li>
+                                <h4><a href="/kubernetes/">An introduction to Kubernetes.</a></h4>
+                                <div class="read-next-card-meta">
+                                    <p><time datetime="2019-11-26">26 Nov 2019</time> –
+                                        15 min read</p>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                    <footer class="read-next-card-footer">
+                        <a href="/tag/data-science/">See all 47 posts
+                            →</a>
+                    </footer>
+                </article>
+
+                <article class="post-card post tag-resolutions no-image no-image">
+
+
+    <div class="post-card-content">
+
+        <a class="post-card-content-link" href="/new-years-resolutions-2018/">
+
+            <header class="post-card-header">
+                    <div class="post-card-primary-tag">Resolutions</div>
+                <h2 class="post-card-title">New Year&#x27;s Resolutions 2018</h2>
+            </header>
+
+            <section class="post-card-excerpt">
+                    <p>After revisiting my 2017 resolutions and evaluating how well I adhered each resolution, I'd like to set forth my resolutions for the coming year. This year, I'll set more measurable goals so that I can more effectively evaluate my performance at the end of</p>
+            </section>
+
+        </a>
+
+        <footer class="post-card-meta">
+            <ul class="author-list">
+                <li class="author-list-item">
+            
+                    <div class="author-name-tooltip">
+                        Jeremy Jordan
+                    </div>
+            
+                    <a href="/author/jeremy/" class="static-avatar">
+                        <img class="author-profile-image" src="/content/images/size/w100/2018/03/headshot-small.jpeg" alt="Jeremy Jordan" />
+                    </a>
+                </li>
+            </ul>
+            <div class="post-card-byline-content">
+                <span><a href="/author/jeremy/">Jeremy Jordan</a></span>
+                <span class="post-card-byline-date"><time datetime="2018-01-18">18 Jan 2018</time> <span class="bull">&bull;</span> 2 min read</span>
+            </div>
+        </footer>
+
+    </div>
+
+</article>
+
+                <article class="post-card post tag-blockchain no-image no-image">
+
+
+    <div class="post-card-content">
+
+        <a class="post-card-content-link" href="/blockchain-introduction/">
+
+            <header class="post-card-header">
+                    <div class="post-card-primary-tag">Blockchain</div>
+                <h2 class="post-card-title">What the heck is blockchain?</h2>
+            </header>
+
+            <section class="post-card-excerpt">
+                    <p>Lately, I've been talking more and more about blockchain and its potential impact. As I've been learning more about the technology and sharing what I've learned with my friends, I've decided it would be useful to write an introductory post to the technology, paving</p>
+            </section>
+
+        </a>
+
+        <footer class="post-card-meta">
+            <ul class="author-list">
+                <li class="author-list-item">
+            
+                    <div class="author-name-tooltip">
+                        Jeremy Jordan
+                    </div>
+            
+                    <a href="/author/jeremy/" class="static-avatar">
+                        <img class="author-profile-image" src="/content/images/size/w100/2018/03/headshot-small.jpeg" alt="Jeremy Jordan" />
+                    </a>
+                </li>
+            </ul>
+            <div class="post-card-byline-content">
+                <span><a href="/author/jeremy/">Jeremy Jordan</a></span>
+                <span class="post-card-byline-date"><time datetime="2017-10-16">16 Oct 2017</time> <span class="bull">&bull;</span> 8 min read</span>
+            </div>
+        </footer>
+
+    </div>
+
+</article>
+        </div>
+    </div>
+</aside>
+
+
+
+
+        <footer class="site-footer outer">
+            <div class="site-footer-content inner">
+                <section class="copyright"><a href="https://www.jeremyjordan.me">Jeremy Jordan</a> &copy; 2021</section>
+                <nav class="site-footer-nav">
+                    <a href="https://www.jeremyjordan.me">Latest Posts</a>
+                    
+                    <a href="https://twitter.com/jeremyjordan" target="_blank" rel="noopener">Twitter</a>
+                    <a href="https://ghost.org" target="_blank" rel="noopener">Ghost</a>
+                </nav>
+            </div>
+        </footer>
+
+    </div>
+
+    <div class="subscribe-success-message">
+        <a class="subscribe-close" href="javascript:;"></a>
+        You've successfully subscribed to Jeremy Jordan!
+    </div>
+
+    <div id="subscribe" class="subscribe-overlay">
+        <a class="subscribe-close" href="#"></a>
+        <div class="subscribe-overlay-content">
+            <div class="subscribe-form">
+                <h1 class="subscribe-overlay-title">Subscribe to Jeremy Jordan</h1>
+                <p class="subscribe-overlay-description">Stay up to date! Get all the latest & greatest posts delivered straight to your inbox</p>
+                <form data-members-form="subscribe">
+                    <div class="form-group">
+                        <input class="subscribe-email" data-members-email placeholder="youremail@example.com"
+                            autocomplete="false" />
+                        <button class="button primary" type="submit">
+                            <span class="button-content">Subscribe</span>
+                            <span class="button-loader"><svg version="1.1" id="loader-1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px"
+    y="0px" width="40px" height="40px" viewBox="0 0 40 40" enable-background="new 0 0 40 40" xml:space="preserve">
+    <path opacity="0.2" fill="#000" d="M20.201,5.169c-8.254,0-14.946,6.692-14.946,14.946c0,8.255,6.692,14.946,14.946,14.946
+s14.946-6.691,14.946-14.946C35.146,11.861,28.455,5.169,20.201,5.169z M20.201,31.749c-6.425,0-11.634-5.208-11.634-11.634
+c0-6.425,5.209-11.634,11.634-11.634c6.425,0,11.633,5.209,11.633,11.634C31.834,26.541,26.626,31.749,20.201,31.749z" />
+    <path fill="#000" d="M26.013,10.047l1.654-2.866c-2.198-1.272-4.743-2.012-7.466-2.012h0v3.312h0
+C22.32,8.481,24.301,9.057,26.013,10.047z">
+        <animateTransform attributeType="xml" attributeName="transform" type="rotate" from="0 20 20" to="360 20 20"
+            dur="0.5s" repeatCount="indefinite" />
+    </path>
+</svg></span>
+                        </button>
+                    </div>
+                    <div class="message-success">
+                        <strong>Great!</strong> Check your inbox and click the link to confirm your subscription.
+                    </div>
+                    <div class="message-error">
+                        Please enter a valid email address!
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script
+        src="https://code.jquery.com/jquery-3.4.1.min.js"
+        integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+        crossorigin="anonymous">
+    </script>
+    <script src="/assets/built/casper.js?v=3e9ac38a9e"></script>
+
+    <script>
+        // Parse the URL parameter
+        function getParameterByName(name, url) {
+            if (!url) url = window.location.href;
+            name = name.replace(/[\[\]]/g, "\\$&");
+            var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+                results = regex.exec(url);
+            if (!results) return null;
+            if (!results[2]) return '';
+            return decodeURIComponent(results[2].replace(/\+/g, " "));
+        }
+
+        // Give the parameter a variable name
+        var action = getParameterByName('action');
+
+        $(document).ready(function () {
+            if (action == 'subscribe') {
+                $('body').addClass("subscribe-success");
+            }
+
+            $('.subscribe-success-message .subscribe-close').click(function () {
+                $('.subscribe-success-message').addClass('close');
+            });
+
+            // Reset form on opening subscrion overlay
+            $('.subscribe-button').click(function() {
+                $('.subscribe-overlay form').removeClass();
+                $('.subscribe-email').val('');
+            });
+        });
+    </script>
+
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({
+            tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']],
+                      displayMath: [['$$','$$'], ['\[','\]']]}
+        });
+    </script>
+
+    <script>
+    $(document).ready(function () {
+        // FitVids - start
+        var $postContent = $(".post-full-content");
+        $postContent.fitVids();
+        // FitVids - end
+
+        // Replace nav with title on scroll - start
+        Casper.stickyNavTitle({
+            navSelector: '.site-nav-main',
+            titleSelector: '.post-full-title',
+            activeClass: 'nav-post-title-active'
+        });
+        // Replace nav with title on scroll - end
+
+        // Hover on avatar
+        var hoverTimeout;
+        $('.author-list-item').hover(function () {
+            var $this = $(this);
+
+            clearTimeout(hoverTimeout);
+
+            $('.author-card').removeClass('hovered');
+            $(this).children('.author-card').addClass('hovered');
+
+        }, function () {
+            var $this = $(this);
+
+            hoverTimeout = setTimeout(function () {
+                $this.children('.author-card').removeClass('hovered');
+            }, 800);
+        });
+    });
+</script>
+
+
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.7.0/highlight.min.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+
+</body>
+</html>
